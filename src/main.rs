@@ -8,21 +8,12 @@ use std::time::Duration;
 
 static BASE_URL: &'static str = "https://api.github.com";
 
-fn main() {
+fn main() -> Result<(), serde_json::error::Error> {
     let owner: &str = "sagan1";
     let repo: &str = "venus";
 
-    let jobs_list = match get_first_run(owner, repo) {
-        Ok(run) => match get_jobs_list(owner, repo, run.id) {
-            Ok(list) => list,
-            _ => JobsList {
-                jobs: vec![]
-            }
-        },
-        _ => JobsList {
-            jobs: vec![]
-        }
-    };
+    let run = get_first_run(owner, repo)?;
+    let jobs_list = get_jobs_list(owner, repo, run.id)?;
 
     if jobs_list.jobs.is_empty() {
         println!("No jobs found");
@@ -41,11 +32,13 @@ fn main() {
         }
 
         thread::sleep(Duration::from_secs(1));
-        main()
+        main();
 
     } else {
         println!("Completed all jobs");
     }
+
+    Ok(())
 }
 
 // gets the most recent run_id for a repo's workflow
