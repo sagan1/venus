@@ -19,7 +19,7 @@ fn main() {
     let current_job: Option<&Job> = jobs_list.jobs.iter()
         .find(|j| matches!(j.identity.status, Status::InProgress));
 
-    if jobs_list.jobs.iter().all(|j| matches!(j.identity.status, Status::Completed)) {
+    if !jobs_list.jobs.iter().all(|j| matches!(j.identity.status, Status::Completed)) {
 
         if current_job.is_some() {
             println!("{}{}", get_jobs_list_string(&jobs_list.jobs), get_steps_list_string(&current_job.unwrap().steps));
