@@ -37,14 +37,14 @@ pub mod parsing {
 
     #[derive(Serialize, Deserialize)]
     pub struct Identity {
-        pub name: Option<String>,
+        pub name: String,
         pub status: Status,
         pub conclusion: Option<Conclusion>
     }
 
     #[derive(Serialize, Deserialize)]
     pub struct TimeStat {
-        pub started_at: String,
+        pub started_at: Option<String>,
         pub completed_at: Option<String>
     }
 
@@ -97,23 +97,29 @@ pub mod formatter {
     // get the colored name for an Identity based on its current status and conclusion
     fn color_identity_name(identity: &Identity) -> String {
         match identity.status {
-            Status::Queued => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().truecolor(130, 130, 130),
-            Status::InProgress => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().yellow(),
+            Status::Queued => identity.name.as_str().truecolor(130, 130, 130),
+            Status::InProgress => identity.name.as_str().yellow(),
             Status::Completed => match identity.conclusion.as_ref().unwrap_or(&Conclusion::Neutral) {
-                Conclusion::Success => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().green(),
-                Conclusion::Neutral => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().yellow(),
-                _ => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().red()
+                Conclusion::Success => identity.name.as_str().green(),
+                Conclusion::Neutral => identity.name.as_str().yellow(),
+                _ => identity.name.as_str().red()
             }
         }.to_string()
     }
 
     // gets the time elapsed in seconds for this current TimeStat
     pub fn get_seconds_elapsed(time_stat: &TimeStat) -> i64 {
+
+        let started_at = &time_stat.started_at;
+        if started_at.is_none() {
+            return 0
+        }
+
         match &time_stat.completed_at {
             Some(finish) => DateTime::parse_from_rfc3339(finish.as_str()).unwrap()
-                .signed_duration_since(DateTime::parse_from_rfc3339(time_stat.started_at.as_str()).unwrap()).num_seconds(),
+                .signed_duration_since(DateTime::parse_from_rfc3339(started_at.as_ref().unwrap().as_str()).unwrap()).num_seconds(),
             None => Utc::now().signed_duration_since(
-                DateTime::parse_from_rfc3339(time_stat.started_at.as_str()).unwrap()).num_seconds()
+                DateTime::parse_from_rfc3339(started_at.as_ref().unwrap().as_str()).unwrap()).num_seconds()
         }
     }
 
