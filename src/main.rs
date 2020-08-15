@@ -16,13 +16,13 @@ fn main() -> Result<(), serde_json::error::Error> {
     let run = runs_list.get_most_recent();
     if run.is_none() {
         println!("No runs found");
-        exit(1)
+        exit(1);
     }
 
     let jobs_list = get_jobs_list(owner, repo, run.unwrap().id)?;
     if jobs_list.jobs.is_empty() {
         println!("No jobs found");
-        exit(1)
+        exit(1);
     }
 
     let current_job: Option<&Job> = jobs_list.jobs.iter()
@@ -31,7 +31,7 @@ fn main() -> Result<(), serde_json::error::Error> {
     if jobs_list.jobs.iter().all(|j| matches!(j.identity.status, Status::Completed)) {
 
         if current_job.is_some() {
-            println!("{}{}", get_jobs_list_string(&jobs_list.jobs), get_steps_list_string(&current_job.unwrap().steps))
+            println!("{}{}", get_jobs_list_string(&jobs_list.jobs), get_steps_list_string(&current_job.unwrap().steps));
         } else {
             println!("No current job found");
         }
