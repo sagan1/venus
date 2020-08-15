@@ -19,9 +19,10 @@ fn main() {
 
 // gets the list of runs for this workflow
 fn get_runs_list(owner: &str, repo: &str) -> Result<RunsList, serde_json::error::Error> {
-    let run_id_string = ureq::get(format!("{}/repos/{}/{}/actions/runs", BASE_URL, owner, repo).as_str())
+    let runs_list_string = ureq::get(format!("{}/repos/{}/{}/actions/runs", BASE_URL, owner, repo).as_str())
         .call().into_string().unwrap();
-    let runs: RunsList = serde_json::from_str(run_id_string.as_str())?;
+    println!("{}", runs_list_string);
+    let runs: RunsList = serde_json::from_str(runs_list_string.as_str())?;
 
     Ok(runs)
 }
