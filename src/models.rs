@@ -97,12 +97,12 @@ pub mod formatter {
     // get the colored name for an Identity based on its current status and conclusion
     fn color_identity_name(identity: &Identity) -> String {
         match identity.status {
-            Status::Queued => identity.name.unwrap_or("null".to_string()).as_str().truecolor(130, 130, 130),
-            Status::InProgress => identity.name.unwrap_or("null".to_string()).as_str().yellow(),
+            Status::Queued => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().truecolor(130, 130, 130),
+            Status::InProgress => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().yellow(),
             Status::Completed => match identity.conclusion.as_ref().unwrap_or(&Conclusion::Neutral) {
-                Conclusion::Success => identity.name.unwrap_or("null".to_string()).as_str().green(),
-                Conclusion::Neutral => identity.name.unwrap_or("null".to_string()).as_str().yellow(),
-                _ => identity.name.unwrap_or("null".to_string()).as_str().red()
+                Conclusion::Success => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().green(),
+                Conclusion::Neutral => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().yellow(),
+                _ => identity.name.as_ref().unwrap_or(&"null".to_string()).as_str().red()
             }
         }.to_string()
     }
