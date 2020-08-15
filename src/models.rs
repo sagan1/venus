@@ -32,7 +32,7 @@ pub mod parsing {
     #[derive(Serialize, Deserialize)]
     pub struct Run {
         pub id: i64,
-        pub updated_at: String
+        pub created_at: String
     }
 
     #[derive(Serialize, Deserialize)]
