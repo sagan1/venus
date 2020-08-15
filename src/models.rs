@@ -1,9 +1,38 @@
 pub mod parsing {
     use serde::{Deserialize, Serialize};
+    use chrono::{DateTime, Utc};
+
+    #[derive(Serialize, Deserialize)]
+    pub struct RunsList {
+        pub workflow_runs: Vec<Run>
+    }
+
+    // methods and functions for RunList
+    impl RunsList {
+        // gets the most recent run from the run list based on updated date
+        pub fn get_most_recent(&self) -> Option<&Run> {
+            let mut recent: Option<&Run> = None;
+            for run in &self.workflow_runs {
+
+                if recent.is_some() {
+                    let diff = DateTime::parse_from_rfc3339(recent.unwrap().updated_at.as_str()).unwrap()
+                        .signed_duration_since(DateTime::parse_from_rfc3339(run.updated_at.as_str()).unwrap()).num_seconds();
+                    if diff < 0 {
+                        recent = Some(run);
+                    }
+                } else {
+                    recent = Some(run);
+                }
+            }
+
+            recent
+        }
+    }
 
     #[derive(Serialize, Deserialize)]
     pub struct Run {
-        pub id: i64
+        pub id: i64,
+        pub updated_at: String
     }
 
     #[derive(Serialize, Deserialize)]

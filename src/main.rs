@@ -1,6 +1,6 @@
 mod models;
 
-use crate::models::parsing::{Job, Run, JobsList, Status};
+use crate::models::parsing::{Job, Run, JobsList, Status, RunsList};
 use std::process::exit;
 use std::thread;
 use crate::models::formatter::{get_jobs_list_string, get_steps_list_string};
@@ -12,12 +12,17 @@ fn main() -> Result<(), serde_json::error::Error> {
     let owner: &str = "sagan1";
     let repo: &str = "venus";
 
-    let run = get_first_run(owner, repo)?;
-    let jobs_list = get_jobs_list(owner, repo, run.id)?;
+    let runs_list = get_runs_list(owner, repo)?;
+    let run = runs_list.get_most_recent();
+    if run.is_none() {
+        println!("No runs found");
+        exit(1)
+    }
 
+    let jobs_list = get_jobs_list(owner, repo, run.unwrap().id)?;
     if jobs_list.jobs.is_empty() {
         println!("No jobs found");
-        exit(0)
+        exit(1)
     }
 
     let current_job: Option<&Job> = jobs_list.jobs.iter()
@@ -41,13 +46,13 @@ fn main() -> Result<(), serde_json::error::Error> {
     Ok(())
 }
 
-// gets the most recent run_id for a repo's workflow
-fn get_first_run(owner: &str, repo: &str) -> Result<Run, serde_json::error::Error> {
+// gets the list of runs for this workflow
+fn get_runs_list(owner: &str, repo: &str) -> Result<RunsList, serde_json::error::Error> {
     let run_id_string = ureq::get(format!("{}/repos/{}/{}/actions/runs", BASE_URL, owner, repo).as_str())
         .call().into_string().unwrap();
-    let run: Run = serde_json::from_str(run_id_string.as_str())?;
+    let runs: RunsList = serde_json::from_str(run_id_string.as_str())?;
 
-    Ok(run)
+    Ok(runs)
 }
 
 // gets the list of jobs for this run
@@ -55,7 +60,7 @@ fn get_jobs_list(owner: &str, repo: &str, run_id: i64) -> Result<JobsList, serde
     let jobs_list_string = ureq::get(format!("{}/repos/{}/{}/actions/runs/{}/jobs", BASE_URL, owner, repo, run_id).as_str())
         .call().into_string().unwrap();
 
-    let jobs_list: JobsList = serde_json::from_str(jobs_list_string.as_str())?;
+    let jobs_list: JobsList = serde_json::from_str::<JobsList>(jobs_list_string.as_str())?;
 
     Ok(jobs_list)
 }
