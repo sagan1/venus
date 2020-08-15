@@ -1,6 +1,6 @@
 pub mod parsing {
     use serde::{Deserialize, Serialize};
-    use chrono::{DateTime, Utc};
+    use chrono::{DateTime};
 
     #[derive(Serialize, Deserialize)]
     pub struct RunsList {

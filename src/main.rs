@@ -1,29 +1,20 @@
 mod models;
 
-use crate::models::parsing::{Job, Run, JobsList, Status, RunsList};
-use std::process::exit;
+use crate::models::parsing::{Job, JobsList, Status, RunsList};
 use std::thread;
 use crate::models::formatter::{get_jobs_list_string, get_steps_list_string};
 use std::time::Duration;
 
 static BASE_URL: &'static str = "https://api.github.com";
 
-fn main() -> Result<(), serde_json::error::Error> {
+fn main() {
     let owner: &str = "sagan1";
     let repo: &str = "venus";
 
-    let runs_list = get_runs_list(owner, repo)?;
+    let runs_list = get_runs_list(owner, repo).expect("Getting the runs list was unsuccessful");
     let run = runs_list.get_most_recent();
-    if run.is_none() {
-        println!("No runs found");
-        exit(1);
-    }
 
-    let jobs_list = get_jobs_list(owner, repo, run.unwrap().id)?;
-    if jobs_list.jobs.is_empty() {
-        println!("No jobs found");
-        exit(1);
-    }
+    let jobs_list = get_jobs_list(owner, repo, run.unwrap().id).expect("Getting the jobs list was unsuccessful");
 
     let current_job: Option<&Job> = jobs_list.jobs.iter()
         .find(|j| matches!(j.identity.status, Status::InProgress));
@@ -42,8 +33,6 @@ fn main() -> Result<(), serde_json::error::Error> {
     } else {
         println!("Completed all jobs");
     }
-
-    Ok(())
 }
 
 // gets the list of runs for this workflow
