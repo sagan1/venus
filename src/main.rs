@@ -1,10 +1,10 @@
 mod models;
 
-use serde_json::Value;
 use crate::models::parsing::{Job, Run, JobsList, Status};
 use std::process::exit;
 use std::thread;
 use crate::models::formatter::{get_jobs_list_string, get_steps_list_string};
+use std::time::Duration;
 
 static BASE_URL: &'static str = "https://api.github.com";
 
@@ -33,7 +33,7 @@ fn main() {
             println!("No current job found");
         }
 
-        thread::sleep(StdDuration::from_secs(1));
+        thread::sleep(Duration::from_secs(1));
         main()
 
     } else {
