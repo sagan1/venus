@@ -15,8 +15,8 @@ pub mod parsing {
             for run in &self.workflow_runs {
 
                 if recent.is_some() {
-                    let diff = DateTime::parse_from_rfc3339(recent.unwrap().updated_at.as_str()).unwrap()
-                        .signed_duration_since(DateTime::parse_from_rfc3339(run.updated_at.as_str()).unwrap()).num_seconds();
+                    let diff = DateTime::parse_from_rfc3339(recent.unwrap().created_at.as_str()).unwrap()
+                        .signed_duration_since(DateTime::parse_from_rfc3339(run.created_at.as_str()).unwrap()).num_seconds();
                     if diff < 0 {
                         recent = Some(run);
                     }
